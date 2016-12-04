@@ -32,6 +32,7 @@ bluish =
 
 pegColor =
     bluish
-emptyColor =
+jumperColor =
+    greenish
+openColor =
     grayish
-        

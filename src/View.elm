@@ -70,10 +70,22 @@ clickMsgWhenThereIsJumper model jumper spot =
 getColor : Model -> Spot -> String
 getColor model spot =
     if Set.member spot model.pegs then
-        pegColor
+        getPegColor model spot
     else
-        emptyColor
+        openColor
     
+
+getPegColor : Model -> Spot -> String
+getPegColor model spot =
+    case model.state of
+        Jumper jumper ->
+            if spot == jumper then
+                jumperColor
+            else
+                pegColor
+        otherwise ->
+            pegColor
+
 
 ------------------
 
