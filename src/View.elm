@@ -2,6 +2,7 @@ module View exposing (view)
 
 import Types exposing (..)
 import Constants exposing (..)
+import Peg exposing (..)
 
 import Set exposing (..)
 import Html exposing (Html, button, div, text)
@@ -13,7 +14,14 @@ import Svg.Attributes exposing (..)
 view : Model -> Html Msg
 view model =
     div []
-        [ svg [ version "1.1"
+        [ Html.text <|
+              toString (Set.size model.pegs)
+              ++ " pegs"
+              ++ if model.state == Done then
+                     " - DONE!"
+                 else
+                     ""
+        , svg [ version "1.1"
               , x "0"
               , y "0"
               , viewBox "0 0 200 200"
@@ -44,7 +52,7 @@ getClickMsg model spot =
             clickMsgWhenThereIsJumper model jumper spot
                             
         NoJumper ->
-            if isMovable spot model then
+            if isMovable spot model.pegs then
                 Just (JumpFrom spot)
             else
                 Nothing
@@ -61,7 +69,7 @@ clickMsgWhenThereIsJumper model jumper spot =
         if Set.member spot model.pegs then
             Just ReleaseJumper
         else
-            if isReachable spot jumper model then
+            if canReach jumper spot model.pegs then
                 Just (JumpTo spot)
             else
                 Nothing
@@ -86,67 +94,6 @@ getPegColor model spot =
         otherwise ->
             pegColor
 
-
-------------------
-
-isReachable : Spot -> Spot -> Model -> Bool
-isReachable spot peg model =
-    Set.member spot (jumpToSpots peg model)
-
-
--- Assumes 'peg' is actually a peg, not open.
-jumpToSpots : Spot -> Model -> Set Spot
-jumpToSpots peg model =
-    [North, South, East, West]
-        |> List.filter (canJump peg model)
-        |> List.map (spotsAway peg 2)
-        |> Set.fromList
-
-
-isMovable : Spot -> Model -> Bool
-isMovable peg model =
-    List.any (canJump peg model)
-        [North, South, East, West]
-
-
-canJump : Spot -> Model -> Direction -> Bool
-canJump peg model direction =
-    let
-        oneAway =
-            spotsAway peg 1 direction
-        twoAway =
-            spotsAway peg 2 direction
-        isFree s =
-            not (Set.member s model.pegs)
-    in
-        isLegal twoAway && isFree twoAway &&
-            isLegal oneAway && not (isFree oneAway)
-            
-
-isLegal : Spot -> Bool
-isLegal spot =
-    Set.member spot Constants.allSpots
-
-
-{-
-Returns coordinate for a spot.
-May NOT be a LEGAL spot.
--}
-spotsAway : Spot -> Int -> Direction -> Spot
-spotsAway (col,row) numSteps direction =
-    case direction of
-        North ->
-            (col - numSteps, row)
-
-        South ->
-            (col + numSteps, row)
-
-        East ->
-            (col, row + numSteps)
-
-        West ->
-            (col, row - numSteps)
-            
 
 -----------------
 

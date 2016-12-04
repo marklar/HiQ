@@ -1,8 +1,10 @@
 module Update exposing (..)
 
 import Set exposing (..)
+import Debug exposing (log)
 
 import Types exposing (..)
+import Peg exposing (isMovable)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -44,12 +46,19 @@ jumpTo spot model =
                     model.pegs
                            
         model_ =
-            { state = NoJumper
+            { state = if isDone pegs_ then Done else NoJumper
             , pegs = pegs_
             }
     in
         (model_, Cmd.none)
-    
+
+
+isDone : Set Spot -> Bool
+isDone pegs =
+    pegs
+        |> Set.filter (\p -> isMovable p pegs)
+        |> Set.isEmpty
+
 
 spotBetween : Spot -> Spot -> Spot
 spotBetween (c1,r1) (c2,r2) =
