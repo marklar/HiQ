@@ -7,26 +7,14 @@ import Set exposing (..)
 type alias Spot = (Int,Int)
 
 
--- (x,y)
-type alias Pt = (Float,Float)
-
-
 type alias Model =
   { state : State
   , pegs : Set Spot
-  , movablePegs : Set Spot     -- subset of pegs
-  , jumper : Maybe Spot
   } 
 
 
-type Direction = North
-               | South
-               | East
-               | West
-
-
-type State = NoJumper
-           | Jumper Spot
+type State = Jumper Spot
+           | NoJumper
            | Done
 
 
@@ -34,3 +22,8 @@ type Msg = JumpFrom Spot
          | JumpTo Spot
          | ReleaseJumper
 
+
+type Direction = North
+               | South
+               | East
+               | West
