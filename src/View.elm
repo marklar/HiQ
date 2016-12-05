@@ -43,7 +43,7 @@ oneSpot : Model -> Spot -> Svg Msg
 oneSpot model spot =
     circle (getColor model spot)
         Constants.spotRadius
-            (getCenter spot)
+            (Peg.spotCenter spot)
             (getMousedownMsg model spot)
 
 
@@ -85,12 +85,9 @@ getPegColor model spot =
 
 -----------------
 
--- (x,y)
-type alias Pt = (Float,Float)
 
-
-circle : String -> Float -> Pt -> Maybe (Attribute Msg) -> Svg Msg
-circle color size (x,y) attrMsg =
+circle : String -> Float -> Position -> Maybe (Attribute Msg) -> Svg Msg
+circle color size {x,y} attrMsg =
     let
         baseAttrs =
             [ fill color
@@ -108,13 +105,3 @@ circle color size (x,y) attrMsg =
                     baseAttrs
     in
         Svg.circle attrs []
-
-
-getCenter : Spot -> Pt
-getCenter (col, row) =
-    let
-        dist i =
-            (toFloat i * 3.0 * Constants.spotRadius) +
-                (1.5 * Constants.spotRadius)
-    in
-        (dist col, dist row)

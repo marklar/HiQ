@@ -6,7 +6,7 @@ import Mouse exposing (Position)
 import Debug exposing (..)
 
 import Types exposing (..)
-import Peg exposing (isMovable, canReach)
+import Peg exposing (isMovable, canReach, spotCenter)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -26,6 +26,7 @@ update msg model =
         (model_, Cmd.none)
 
 
+-- Create jumper
 dragStart : Spot -> Position -> Model -> Model
 dragStart spot position model =
     { model |
@@ -36,6 +37,7 @@ dragStart spot position model =
     }
 
 
+-- Update jumper's position
 dragAt : Position -> Model -> Model
 dragAt position model =
     case model.jumper of
@@ -49,24 +51,12 @@ dragAt position model =
             }
 
 
+-- Update pegs
 dragEnd : Position -> Model -> Model
 dragEnd position model =
     let
         pegs_ =
-            case model.jumper of
-                Nothing ->
-                    Debug.crash "This should never happen"
-
-                Just j ->
-                    case getDropSpot position j.spot model of
-                        Nothing ->
-                            model.pegs
-
-                        Just dropSpot ->
-                            model.pegs
-                                |> Set.remove j.spot
-                                |> Set.insert dropSpot
-                                |> Set.remove (spotBetween j.spot dropSpot)
+            pegsAfterDrop position model
     in
         { gameOver = isGameOver pegs_
         , jumper = Nothing
@@ -75,6 +65,24 @@ dragEnd position model =
 
 
 ---------------
+
+
+pegsAfterDrop : Position -> Model -> Set Spot
+pegsAfterDrop position model =
+    case model.jumper of
+        Nothing ->
+            Debug.crash "This should never happen"
+
+        Just j ->
+            case getDropSpot position j.spot model of
+                Nothing ->
+                    model.pegs
+
+                Just dropSpot ->
+                    model.pegs
+                        |> Set.remove j.spot
+                        |> Set.insert dropSpot
+                        |> Set.remove (spotBetween j.spot dropSpot)
 
 
 getDropSpot : Position -> Spot -> Model -> Maybe Spot

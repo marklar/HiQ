@@ -1,16 +1,33 @@
-module Peg exposing (canReach, isMovable)
+module Peg exposing (canReach, isMovable, spotCenter)
 
 import Set exposing (..)
+import Mouse exposing (Position)
+import Debug exposing (..)
 
 import Types exposing (..)
 import Constants exposing (..)
 
+
+spotCenter : Spot -> Position
+spotCenter (col, row) =
+    let
+        dist i =
+            (i+1) * 3 * Constants.spotRadius
+    in
+        { x = dist col
+        , y = dist row
+        }
 
 {-
 isThereOverlap : Position -> Position -> Bool
 isThereOverlap pos1 pos2 =
 -}
 
+{-
+jumperPosition : Jumper -> Position
+jumperPosition {spot, dragInit, dragNow} =
+    Debug.crash "TODO"
+-}
 
 canReach : Spot -> Spot -> Set Spot -> Bool
 canReach peg spot pegs =
