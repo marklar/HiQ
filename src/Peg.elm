@@ -6,6 +6,12 @@ import Types exposing (..)
 import Constants exposing (..)
 
 
+{-
+isThereOverlap : Position -> Position -> Bool
+isThereOverlap pos1 pos2 =
+-}
+
+
 canReach : Spot -> Spot -> Set Spot -> Bool
 canReach peg spot pegs =
     Set.member spot (jumpToSpots peg pegs)

@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Set exposing (..)
 import Html exposing (Html, button, div, text)
+import Mouse exposing (Position)
 
 import Types exposing (..)
 import Constants exposing (..)
@@ -13,7 +14,7 @@ main =
     Html.program { init = (initModel, Cmd.none)
                  , view = View.view
                  , update = Update.update
-                 , subscriptions = always Sub.none
+                 , subscriptions = subscriptions
                  }
 
 
@@ -21,6 +22,7 @@ main =
 
 initModel =
     { state = NoJumper
+    , drag = Nothing
     , pegs = initPegs
     }
 
@@ -28,3 +30,17 @@ initModel =
 initPegs : Set Spot
 initPegs =
     Set.remove (3,3) Constants.allSpots
+
+
+{- SUBS -}
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    case model.drag of
+        Nothing ->
+            Sub.none
+
+        Just _ ->
+            Sub.batch [ Mouse.moves DragAt
+                      , Mouse.ups DragEnd
+                      ]

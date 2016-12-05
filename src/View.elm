@@ -9,6 +9,8 @@ import Html exposing (Html, button, div, text)
 import Svg exposing (..)
 import Svg.Events exposing (..)
 import Svg.Attributes exposing (..)
+import Json.Decode as Decode
+import Mouse exposing (Position)
 
 
 view : Model -> Html Msg
@@ -17,7 +19,7 @@ view model =
         [ Html.text <|
               toString (Set.size model.pegs)
               ++ " pegs"
-              ++ if model.state == Done then
+              ++ if model.state == GameOver then
                      " - DONE!"
                  else
                      ""
@@ -42,39 +44,25 @@ oneSpot model spot =
     circle (getColor model spot)
         Constants.spotRadius
             (getCenter spot)
-            (getClickMsg model spot)
+            (getMousedownMsg model spot)
 
 
-getClickMsg : Model -> Spot -> Maybe Msg
-getClickMsg model spot =
+getMousedownMsg : Model -> Spot -> Maybe (Attribute Msg)
+getMousedownMsg model spot =
     case model.state of
-        Jumper jumper ->
-            clickMsgWhenThereIsJumper model jumper spot
-                            
         NoJumper ->
             if isMovable spot model.pegs then
-                Just (JumpFrom spot)
+                Just (on "mousedown" (Decode.map (DragStart spot) Mouse.position))
             else
                 Nothing
-                                        
-        Done ->
+
+        otherwise ->
             Nothing
                 
 
-clickMsgWhenThereIsJumper : Model -> Spot -> Spot -> Maybe Msg
-clickMsgWhenThereIsJumper model jumper spot =
-    if spot == jumper then
-        Nothing
-    else
-        if Set.member spot model.pegs then
-            Just ReleaseJumper
-        else
-            if canReach jumper spot model.pegs then
-                Just (JumpTo spot)
-            else
-                Nothing
+-- if canReach jumper spot model.pegs then
+-- if Set.member spot model.pegs then
                 
-
 getColor : Model -> Spot -> String
 getColor model spot =
     if Set.member spot model.pegs then
@@ -101,8 +89,8 @@ getPegColor model spot =
 type alias Pt = (Float,Float)
 
 
-circle : String -> Float -> Pt -> Maybe Msg -> Svg Msg
-circle color size (x,y) clickMsg =
+circle : String -> Float -> Pt -> Maybe (Attribute Msg) -> Svg Msg
+circle color size (x,y) attrMsg =
     let
         baseAttrs =
             [ fill color
@@ -112,9 +100,9 @@ circle color size (x,y) clickMsg =
             ]
       
         attrs =
-            case clickMsg of
+            case attrMsg of
                 Just m ->
-                    (onClick m) :: baseAttrs
+                    m :: baseAttrs
 
                 Nothing ->
                     baseAttrs
@@ -130,5 +118,3 @@ getCenter (col, row) =
                 (1.5 * Constants.spotRadius)
     in
         (dist col, dist row)
-
-        

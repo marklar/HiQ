@@ -63,18 +63,20 @@ over.
 
 #### Update: Dragging
 
-Using subscriptions, one can get the following relevant mouse
+To know when dragging begins, we'll set 'mousedown' attributes on only
+those particular spots eligible to be jumpers. That way, we don't have
+to figure out whether a click somewhere corresponds to a potential
+jumper (i.e. by calculating from the mouse position -> peg). That's
+exactly what they do in the
+['drag' example](http://elm-lang.org/examples/drag).
+
+Then, using subscriptions, one can get the following relevant mouse
 activity:
 
 + moves
-+ downs
 + ups
 
 Each provides the Msg with its Mouse.Position ({x,y}).
-
-With just clicking (and not dragging), we either have a chosen jumper
-or don't. They get chosen, unchosen, and 'dropped' all via clicks. But
-with dragging, we'll no longer need clicks.
 
 We'll still need to know whether the user is dragging a jumper or not,
 and if so, from which spot. When drawing the peg that corresponds to
