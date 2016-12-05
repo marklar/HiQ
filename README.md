@@ -61,6 +61,27 @@ click causes the legal landing spots to change color, and selecting
 one of them completes the move. Clicking anywhere else starts the turn
 over.
 
+#### Update: Dragging
+
+Using subscriptions, one can get the following relevant mouse
+activity:
+
++ moves
++ downs
++ ups
+
+Each provides the Msg with its Mouse.Position ({x,y}).
+
+With just clicking (and not dragging), we either have a chosen jumper
+or don't. They get chosen, unchosen, and 'dropped' all via clicks. But
+with dragging, we'll no longer need clicks.
+
+We'll still need to know whether the user is dragging a jumper or not,
+and if so, from which spot. When drawing the peg that corresponds to
+that spot, instead of using the default display, we'll calculate its
+center from our info about the mouse position. We should *also* draw
+an empty spot in the standard place.
+
 
 ## Implementation
 
@@ -104,5 +125,3 @@ Each spot on the board can be in one of a few states:
 We can probably store only the Peg spots in one Dict, indicating for
 each whether it's Stuck or Movable.
 
-
-Finally, 
