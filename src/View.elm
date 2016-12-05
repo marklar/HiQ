@@ -15,21 +15,27 @@ import Mouse exposing (Position)
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ Html.text <|
-              toString (Set.size model.pegs)
-              ++ " pegs"
-              ++ if model.gameOver then
-                     " - DONE!"
-                 else
-                     ""
-        , svg [ version "1.1"
-              , x "0"
-              , y "0"
-              , viewBox "0 0 200 200"
-              ]
-              (board model)
-        ]
+    let
+        maxDimStr =
+            toString (24 * Constants.spotRadius)
+    in
+        div []
+            [ svg [ version "1.1"
+                  , x "0"
+                  , y "0"
+                  , width maxDimStr
+                  , height maxDimStr
+                  -- , viewBox ("0 0 " ++ maxDimStr ++ " " ++ maxDimStr)
+                  ]
+                  (board model)
+            , Html.text <|
+                  toString (Set.size model.pegs)
+                  ++ " pegs"
+                  ++ if model.gameOver then
+                         " - DONE!"
+                     else
+                         ""
+            ]
 
 
 board : Model -> List (Svg Msg)

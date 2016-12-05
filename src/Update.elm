@@ -43,7 +43,7 @@ updateJumper : Position -> Model -> Model
 updateJumper position model =
     case model.jumper of
         Nothing ->
-            Debug.crash "This should never happen"
+            model  -- Debug.crash "This should never happen"
 
         Just jumper ->
             { model |
@@ -74,7 +74,7 @@ pegsAfterDrop : Position -> Model -> Set Spot
 pegsAfterDrop mousePos model =
     case model.jumper of
         Nothing ->
-            Debug.crash "This should never happen"
+            model.pegs  -- Debug.crash "This should never happen"
 
         Just j ->
             case getDropSpot j model of

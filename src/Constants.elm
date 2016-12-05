@@ -19,7 +19,7 @@ allSpots =
 
 
 spotRadius =
-    5
+    25
 
 orangish =
     "#F0AD00"
