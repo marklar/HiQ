@@ -1,6 +1,7 @@
 module Constants exposing (..)
 
 import Set exposing (..)
+import Svg.Attributes exposing (version, x, y, width, height)
 
 import Types exposing (..)
 
@@ -18,8 +19,21 @@ allSpots =
         ]
 
 
+numRadiiWide =
+    7 * 3 + 4
 spotRadius =
     25
+
+svgAttrs =
+    [ version "1.1"
+    , x "0"
+    , y "0"
+    , width maxDimStr
+    , height maxDimStr
+    ]
+
+maxDimStr =
+    toString (numRadiiWide * spotRadius)
 
 orangish =
     "#F0AD00"

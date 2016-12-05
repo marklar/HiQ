@@ -15,56 +15,72 @@ import Mouse exposing (Position)
 
 view : Model -> Html Msg
 view model =
+    div []
+        [ svg svgAttrs (board model)
+        , Html.text <| statusStr model
+        ]
+
+
+statusStr : Model -> String
+statusStr model =
     let
-        maxDimStr =
-            toString (24 * Constants.spotRadius)
+        n =
+            numPegs model
     in
-        div []
-            [ svg [ version "1.1"
-                  , x "0"
-                  , y "0"
-                  , width maxDimStr
-                  , height maxDimStr
-                  -- , viewBox ("0 0 " ++ maxDimStr ++ " " ++ maxDimStr)
-                  ]
-                  (board model)
-            , Html.text <|
-                  toString (Set.size model.pegs)
-                  ++ " pegs"
-                  ++ if model.gameOver then
-                         " - DONE!"
-                     else
-                         ""
-            ]
+        String.concat [ toString n
+                      , if n == 1 then " peg" else " pegs"
+                      , if model.gameOver then " - DONE!" else ""
+                      ]
+
+
+numPegs : Model -> Int
+numPegs model =
+    (Set.size model.pegs) +
+        case model.jumper of
+            Just j ->
+                1
+            Nothing ->
+                0
 
 
 board : Model -> List (Svg Msg)
 board model =
-    Constants.allSpots
-        |> Set.toList
-        |> List.map (oneSpot model) 
+    let
+        spotsSvg =
+            Constants.allSpots
+                |> Set.toList
+                |> List.map (oneSpot model)
+        jumperSvg =
+            case model.jumper of
+                Nothing ->
+                    []
+
+                Just j ->
+                    [viewJumper j model]
+    in
+        -- Put jumper "on top".
+        spotsSvg ++ jumperSvg
+
+
+
+viewJumper : Jumper -> Model -> Svg Msg
+viewJumper jumper model =
+    circle jumperColor
+        Constants.spotRadius
+            (Peg.jumperPosition jumper)
+            Nothing
 
 
 oneSpot : Model -> Spot -> Svg Msg
 oneSpot model spot =
-    let
-        pos =
-            case model.jumper of
-                Nothing ->
-                    Peg.spotCenter spot
-
-                Just j ->
-                    if j.spot == spot then
-                        Peg.jumperPosition j
-                    else
-                        Peg.spotCenter spot
-    in
-        circle (getColor model spot)
-            Constants.spotRadius
-                pos
-                (getMousedownMsg model spot)
+    circle (getColor model spot)
+        Constants.spotRadius
+            (Peg.spotCenter spot)
+            (getMousedownMsg model spot)
 
 
+-- If there's no jumper, include 'mousedown' attribute
+-- on those pegs which are currently movable.
 getMousedownMsg : Model -> Spot -> Maybe (Attribute Msg)
 getMousedownMsg model spot =
     case model.jumper of
@@ -78,28 +94,13 @@ getMousedownMsg model spot =
                 Nothing
                 
 
--- if canReach jumper spot model.pegs then
--- if Set.member spot model.pegs then
-                
 getColor : Model -> Spot -> String
 getColor model spot =
     if Set.member spot model.pegs then
-        getPegColor model spot
+        pegColor
     else
         openColor
     
-
-getPegColor : Model -> Spot -> String
-getPegColor model spot =
-    case model.jumper of
-        Just j ->
-            if spot == j.spot then
-                jumperColor
-            else
-                pegColor
-        otherwise ->
-            pegColor
-
 
 -----------------
 

@@ -31,11 +31,12 @@ update msg model =
 
 createJumper : Spot -> Position -> Model -> Model
 createJumper spot position model =
-    { model |
-          jumper = Just { spot = spot
+    { model
+        | jumper = Just { spot = spot
                         , dragInit = position
                         , dragNow = position
                         }
+        , pegs = Set.remove spot model.pegs
     }
 
 
@@ -79,11 +80,11 @@ pegsAfterDrop mousePos model =
         Just j ->
             case getDropSpot j model of
                 Nothing ->
-                    model.pegs
+                    Set.insert j.spot model.pegs
 
                 Just dropSpot ->
                     model.pegs
-                        |> Set.remove j.spot
+                        -- |> Set.remove j.spot
                         |> Set.insert dropSpot
                         |> Set.remove (spotBetween j.spot dropSpot)
 
