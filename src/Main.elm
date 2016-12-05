@@ -21,8 +21,8 @@ main =
 {- MODEL -}
 
 initModel =
-    { state = NoJumper
-    , drag = Nothing
+    { gameOver = False
+    , jumper = Nothing
     , pegs = initPegs
     }
 
@@ -36,7 +36,7 @@ initPegs =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.drag of
+    case model.jumper of
         Nothing ->
             Sub.none
 

@@ -19,7 +19,7 @@ view model =
         [ Html.text <|
               toString (Set.size model.pegs)
               ++ " pegs"
-              ++ if model.state == GameOver then
+              ++ if model.gameOver then
                      " - DONE!"
                  else
                      ""
@@ -49,15 +49,15 @@ oneSpot model spot =
 
 getMousedownMsg : Model -> Spot -> Maybe (Attribute Msg)
 getMousedownMsg model spot =
-    case model.state of
-        NoJumper ->
+    case model.jumper of
+        Just j ->
+            Nothing
+
+        Nothing ->
             if isMovable spot model.pegs then
                 Just (on "mousedown" (Decode.map (DragStart spot) Mouse.position))
             else
                 Nothing
-
-        otherwise ->
-            Nothing
                 
 
 -- if canReach jumper spot model.pegs then
@@ -73,9 +73,9 @@ getColor model spot =
 
 getPegColor : Model -> Spot -> String
 getPegColor model spot =
-    case model.state of
-        Jumper jumper ->
-            if spot == jumper then
+    case model.jumper of
+        Just j ->
+            if spot == j.spot then
                 jumperColor
             else
                 pegColor

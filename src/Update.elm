@@ -28,26 +28,24 @@ update msg model =
 
 dragStart : Spot -> Position -> Model -> Model
 dragStart spot position model =
-    { state = Jumper spot
-    , drag = Just { start = position
-                  , current = position
-                  }
-    , pegs = model.pegs
+    { model |
+          jumper = Just { spot = spot
+                        , dragInit = position
+                        , dragNow = position
+                        }
     }
 
 
 dragAt : Position -> Model -> Model
 dragAt position model =
-    case model.drag of
+    case model.jumper of
         Nothing ->
-            model
+            Debug.crash "This should never happen"
 
-        Just {start, current} ->
-            { model
-                | drag = Just { start = start
-                              -- , current = Debug.log "pos" position
-                              , current = position
-                              }
+        Just jumper ->
+            { model |
+                  jumper = Just { jumper |
+                                      dragNow = position }
             }
 
 
@@ -55,23 +53,23 @@ dragEnd : Position -> Model -> Model
 dragEnd position model =
     let
         pegs_ =
-            case model.state of
-                Jumper jumper ->
-                    case getDropSpot position jumper model of
+            case model.jumper of
+                Nothing ->
+                    Debug.crash "This should never happen"
+
+                Just j ->
+                    case getDropSpot position j.spot model of
                         Nothing ->
                             model.pegs
 
                         Just dropSpot ->
                             model.pegs
-                                |> Set.remove jumper
+                                |> Set.remove j.spot
                                 |> Set.insert dropSpot
-                                |> Set.remove (spotBetween jumper dropSpot)
-
-                otherwise ->  -- This shouldn't happen
-                    model.pegs
+                                |> Set.remove (spotBetween j.spot dropSpot)
     in
-        { state = if isGameOver pegs_ then GameOver else NoJumper
-        , drag = Nothing
+        { gameOver = isGameOver pegs_
+        , jumper = Nothing
         , pegs = pegs_
         }
 

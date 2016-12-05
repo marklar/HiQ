@@ -9,26 +9,20 @@ type alias Spot = (Int,Int)
 
 
 type alias Model =
-  { state : State
-  , drag : Maybe Drag
-  , pegs : Set Spot
-  } 
-
-
-{-
-This establishes relative distance.
-Determine how far the mouse have moved (since DrageStart).
-Add this to the draggable's orig position.
--}
-type alias Drag =
-    { start : Position
-    , current : Position
+    { gameOver : Bool
+    , jumper : Maybe Jumper
+    , pegs : Set Spot
     }
 
 
-type State = Jumper Spot
-           | NoJumper
-           | GameOver
+type alias Jumper =
+    { spot : Spot
+    {- Drag establishes relative distance.
+    Determine how far the mouse have moved (since DragStart).
+    Add this to the draggable's orig position. -}
+    , dragInit : Position
+    , dragNow : Position
+    }
 
 
 type Msg = DragStart Spot Position
