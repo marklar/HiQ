@@ -1,4 +1,4 @@
-module Update exposing (..)
+module Update exposing (update)
 
 import Set exposing (..)
 import Debug exposing (log)
@@ -7,6 +7,7 @@ import Debug exposing (..)
 
 import Types exposing (..)
 import Peg exposing (isMovable, canReach, spotCenter)
+import Constants exposing (..)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -15,10 +16,10 @@ update msg model =
         model_ =
             case msg of
                 DragStart spot position ->
-                    dragStart spot position model
+                    createJumper spot position model
 
                 DragAt position ->
-                    dragAt position model
+                    updateJumper position model
 
                 DragEnd position ->
                     dragEnd position model
@@ -26,9 +27,10 @@ update msg model =
         (model_, Cmd.none)
 
 
--- Create jumper
-dragStart : Spot -> Position -> Model -> Model
-dragStart spot position model =
+---------------
+
+createJumper : Spot -> Position -> Model -> Model
+createJumper spot position model =
     { model |
           jumper = Just { spot = spot
                         , dragInit = position
@@ -37,9 +39,8 @@ dragStart spot position model =
     }
 
 
--- Update jumper's position
-dragAt : Position -> Model -> Model
-dragAt position model =
+updateJumper : Position -> Model -> Model
+updateJumper position model =
     case model.jumper of
         Nothing ->
             Debug.crash "This should never happen"
@@ -55,8 +56,10 @@ dragAt position model =
 dragEnd : Position -> Model -> Model
 dragEnd position model =
     let
+        model_ =
+            updateJumper position model
         pegs_ =
-            pegsAfterDrop position model
+            pegsAfterDrop position model_
     in
         { gameOver = isGameOver pegs_
         , jumper = Nothing
@@ -68,13 +71,13 @@ dragEnd position model =
 
 
 pegsAfterDrop : Position -> Model -> Set Spot
-pegsAfterDrop position model =
+pegsAfterDrop mousePos model =
     case model.jumper of
         Nothing ->
             Debug.crash "This should never happen"
 
         Just j ->
-            case getDropSpot position j.spot model of
+            case getDropSpot j model of
                 Nothing ->
                     model.pegs
 
@@ -85,25 +88,28 @@ pegsAfterDrop position model =
                         |> Set.remove (spotBetween j.spot dropSpot)
 
 
-getDropSpot : Position -> Spot -> Model -> Maybe Spot
-getDropSpot position jumper model =
-    case getHoverSpot position of
-        Nothing ->
-            Nothing
-
-        Just hoverSpot ->
-            if Peg.canReach jumper hoverSpot model.pegs then
-                Just hoverSpot
-            else
+getDropSpot : Jumper -> Model -> Maybe Spot
+getDropSpot jumper model =
+    let
+        droppables =
+            getHoverSpots (Peg.jumperPosition jumper)
+                |> Set.filter (\s -> Peg.canReach jumper.spot s model.pegs)
+    in
+        case Set.toList droppables of
+            [] ->
                 Nothing
+            s :: _ ->
+                Just s
 
 
--- Determine which Spot (if any) we're hovering over.
-getHoverSpot : Position -> Maybe Spot
-getHoverSpot position =
-    -- Debug.crash "TODO"
-    Just (3,3)
-    -- Nothing
+-- Determine which Spots (if any) we're hovering over.
+-- As it happens, there will be at most two.
+getHoverSpots : Position -> Set Spot
+getHoverSpots jumperPos =
+    -- Set.fromList [(3,3)]
+    Set.toList Constants.allSpots
+        |> List.filter (Peg.spotCenter >> Peg.isThereOverlap jumperPos)
+        |> Set.fromList
 
 
 ---------------

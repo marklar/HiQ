@@ -41,10 +41,22 @@ board model =
 
 oneSpot : Model -> Spot -> Svg Msg
 oneSpot model spot =
-    circle (getColor model spot)
-        Constants.spotRadius
-            (Peg.spotCenter spot)
-            (getMousedownMsg model spot)
+    let
+        pos =
+            case model.jumper of
+                Nothing ->
+                    Peg.spotCenter spot
+
+                Just j ->
+                    if j.spot == spot then
+                        Peg.jumperPosition j
+                    else
+                        Peg.spotCenter spot
+    in
+        circle (getColor model spot)
+            Constants.spotRadius
+                pos
+                (getMousedownMsg model spot)
 
 
 getMousedownMsg : Model -> Spot -> Maybe (Attribute Msg)
