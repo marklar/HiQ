@@ -6,6 +6,7 @@ import Peg exposing (..)
 
 import Set exposing (..)
 import Html exposing (Html, button, div, text)
+import Html.Attributes as HA exposing (style)
 import Svg exposing (..)
 import Svg.Events exposing (..)
 import Svg.Attributes exposing (..)
@@ -17,8 +18,25 @@ view : Model -> Html Msg
 view model =
     div []
         [ svg svgAttrs (board model)
-        , Html.text <| statusStr model
+        , Html.div [ HA.style [ ("padding-left", "10px") ]
+                   ]
+            [ Html.text <| statusStr model ]
+        , restartButton model
         ]
+
+
+restartButton : Model -> Html Msg
+restartButton model =
+    if numPegs model < 32 then
+        Html.button [ HA.style [ ("margin-left", "10px")
+                               , ("background-color", "white")
+                               , ("color", bluish)
+                               ]
+                    , onClick Restart
+                    ]
+            [ Html.text "Restart" ]
+    else
+        Html.text ""
 
 
 statusStr : Model -> String

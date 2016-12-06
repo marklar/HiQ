@@ -5,7 +5,7 @@ import Html exposing (Html, button, div, text)
 import Mouse exposing (Position)
 
 import Types exposing (..)
-import Constants exposing (..)
+import Model exposing (..)
 import View exposing (view)
 import Update exposing (update)
 
@@ -16,21 +16,6 @@ main =
                  , update = Update.update
                  , subscriptions = subscriptions
                  }
-
-
-{- MODEL -}
-
-initModel =
-    { gameOver = False
-    , pegs = initPegs
-    , jumper = Nothing
-    , dropSpot = Nothing
-    }
-
-
-initPegs : Set Spot
-initPegs =
-    Set.remove Constants.centerSpot Constants.allSpots
 
 
 {- SUBS -}

@@ -8,6 +8,7 @@ import Debug exposing (..)
 import Types exposing (..)
 import Peg exposing (isMovable, canReach, spotCenter)
 import Constants exposing (..)
+import Model exposing (..)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -15,6 +16,9 @@ update msg model =
     let
         model_ =
             case msg of
+                Restart ->
+                    Model.initModel
+
                 DragStart spot position ->
                     createJumper spot position model
 

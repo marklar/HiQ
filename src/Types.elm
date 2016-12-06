@@ -29,6 +29,7 @@ type alias Jumper =
 type Msg = DragStart Spot Position
          | DragAt Position
          | DragEnd Position
+         | Restart
 
 
 -- Needed?
