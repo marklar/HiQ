@@ -24,10 +24,15 @@ O O O O O O O
 
 ## To Play
 
-+ one-time setup
-  - [Install Elm](https://guide.elm-lang.org/install.html)
-  - `$ git clone git@github.com:marklar/HiQ.git`
-+ thereafter
+One-time install. Thereafter, just play it.
+
+### Installation
+
++ [Install Elm](https://guide.elm-lang.org/install.html)
++ `$ git clone git@github.com:marklar/HiQ.git`
+
+### Playing
+
 ```
 $ cd HiQ
 $ elm-reactor &
