@@ -22,6 +22,15 @@ O O O O O O O
 ```
 
 
+## To Play
+
++ [Install Elm](https://guide.elm-lang.org/install.html)
++ `$ git clone git@github.com:marklar/HiQ.git`
++ `$ cd HiQ`
++ `$ elm-reactor &`
++ `$ open http://localhost:8000/src/Main.elm`
+
+
 ## Game Logic
 
 There is no AI against which to play, nor any randomness in the setup
