@@ -69,6 +69,7 @@ viewJumper jumper model =
         Constants.spotRadius
             (Peg.jumperPosition jumper)
             Nothing
+            "move"
 
 
 oneSpot : Model -> Spot -> Svg Msg
@@ -77,6 +78,7 @@ oneSpot model spot =
         Constants.spotRadius
             (Peg.spotCenter spot)
             (getMousedownMsg model spot)
+            "default"
 
 
 -- If there's no jumper, include 'mousedown' attribute
@@ -89,7 +91,8 @@ getMousedownMsg model spot =
 
         Nothing ->
             if isMovable spot model.pegs then
-                Just (on "mousedown" (Decode.map (DragStart spot) Mouse.position))
+                Just <| on "mousedown"
+                    <| Decode.map (DragStart spot) Mouse.position
             else
                 Nothing
                 
@@ -99,20 +102,29 @@ getColor model spot =
     if Set.member spot model.pegs then
         pegColor
     else
-        openColor
-    
+        case model.dropSpot of
+            Nothing ->
+                openColor
+
+            Just ds ->
+                if ds == spot then
+                    dropColor
+                else
+                    openColor
 
 -----------------
 
 
-circle : String -> Float -> Position -> Maybe (Attribute Msg) -> Svg Msg
-circle color size {x,y} attrMsg =
+circle : String -> Float -> Position ->
+         Maybe (Attribute Msg) -> String -> Svg Msg
+circle color size {x,y} attrMsg cursorVal =
     let
         baseAttrs =
             [ fill color
             , cx (toString x)
             , cy (toString y)
             , r (toString size)
+            , Svg.Attributes.cursor cursorVal
             ]
       
         attrs =

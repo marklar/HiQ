@@ -19,7 +19,7 @@ update msg model =
                     createJumper spot position model
 
                 DragAt position ->
-                    updateJumper position model
+                    updateJumperAndDrop position model
 
                 DragEnd position ->
                     dragEnd position model
@@ -32,25 +32,32 @@ update msg model =
 createJumper : Spot -> Position -> Model -> Model
 createJumper spot position model =
     { model
-        | jumper = Just { spot = spot
+        | pegs = Set.remove spot model.pegs
+        , jumper = Just { spot = spot
                         , dragInit = position
                         , dragNow = position
                         }
-        , pegs = Set.remove spot model.pegs
     }
 
 
-updateJumper : Position -> Model -> Model
-updateJumper position model =
+updateJumperAndDrop : Position -> Model -> Model
+updateJumperAndDrop position model =
     case model.jumper of
         Nothing ->
             model  -- Debug.crash "This should never happen"
 
         Just jumper ->
-            { model |
-                  jumper = Just { jumper |
-                                      dragNow = position }
-            }
+            let
+                j =
+                    { jumper
+                        | dragNow = position }
+                ds =
+                    getDropSpot j model
+            in
+                { model
+                    | jumper = Just j
+                    , dropSpot = ds
+                }
 
 
 -- Update pegs
@@ -58,13 +65,14 @@ dragEnd : Position -> Model -> Model
 dragEnd position model =
     let
         model_ =
-            updateJumper position model
+            updateJumperAndDrop position model
         pegs_ =
             pegsAfterDrop position model_
     in
         { gameOver = isGameOver pegs_
-        , jumper = Nothing
         , pegs = pegs_
+        , jumper = Nothing
+        , dropSpot = Nothing
         }
 
 
@@ -84,7 +92,6 @@ pegsAfterDrop mousePos model =
 
                 Just dropSpot ->
                     model.pegs
-                        -- |> Set.remove j.spot
                         |> Set.insert dropSpot
                         |> Set.remove (spotBetween j.spot dropSpot)
 
@@ -119,7 +126,7 @@ getHoverSpots jumperPos =
 isGameOver : Set Spot -> Bool
 isGameOver pegs =
     pegs
-        |> Set.filter (\p -> Peg.isMovable p pegs)
+        |> Set.filter (flip Peg.isMovable pegs)
         |> Set.isEmpty
 
 
@@ -127,7 +134,11 @@ spotBetween : Spot -> Spot -> Spot
 spotBetween (c1,r1) (c2,r2) =
     if c1 == c2 then
         -- vertical
-        (c1, (min r1 r2) + 1)
+        ( c1
+        , (min r1 r2) + 1
+        )
     else
         -- horizontal
-        ((min c1 c2) + 1, r1)
+        ( (min c1 c2) + 1
+        , r1
+        )

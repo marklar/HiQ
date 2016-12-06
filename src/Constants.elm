@@ -6,6 +6,10 @@ import Svg.Attributes exposing (version, x, y, width, height)
 import Types exposing (..)
 
 
+centerSpot : Spot
+centerSpot =
+    (3,3)
+
 allSpots : Set Spot
 allSpots =
     Set.fromList
@@ -47,6 +51,8 @@ bluish =
 pegColor =
     bluish
 jumperColor =
-    greenish
+    orangish
 openColor =
     grayish
+dropColor =
+    greenish

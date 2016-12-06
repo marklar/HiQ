@@ -22,14 +22,15 @@ main =
 
 initModel =
     { gameOver = False
-    , jumper = Nothing
     , pegs = initPegs
+    , jumper = Nothing
+    , dropSpot = Nothing
     }
 
 
 initPegs : Set Spot
 initPegs =
-    Set.remove (3,3) Constants.allSpots
+    Set.remove Constants.centerSpot Constants.allSpots
 
 
 {- SUBS -}

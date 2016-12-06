@@ -10,8 +10,9 @@ type alias Spot = (Int,Int)
 
 type alias Model =
     { gameOver : Bool
-    , jumper : Maybe Jumper
     , pegs : Set Spot
+    , jumper : Maybe Jumper
+    , dropSpot : Maybe Spot  -- put inside Jumper?
     }
 
 
