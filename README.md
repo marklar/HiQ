@@ -24,11 +24,15 @@ O O O O O O O
 
 ## To Play
 
-+ [Install Elm](https://guide.elm-lang.org/install.html)
-+ `$ git clone git@github.com:marklar/HiQ.git`
-+ `$ cd HiQ`
-+ `$ elm-reactor &`
-+ `$ open http://localhost:8000/src/Main.elm`
++ one-time setup
+  - [Install Elm](https://guide.elm-lang.org/install.html)
+  - `$ git clone git@github.com:marklar/HiQ.git`
++ thereafter
+```
+$ cd HiQ
+$ elm-reactor &
+$ open http://localhost:8000/src/Main.elm
+```
 
 
 ## Game Logic
